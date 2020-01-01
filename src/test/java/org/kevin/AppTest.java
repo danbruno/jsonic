@@ -148,6 +148,7 @@ public class AppTest {
         SonicSettings sonicSettings = new SonicSettings();
         sonicSettings.setHost("192.168.198.131");
         SonicClient client = new SonicClient(sonicSettings);
+
         CountDownLatch latch = new CountDownLatch(1);
 //        push(client, latch);
         //query(client, latch);

@@ -12,9 +12,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class SonicClient implements Closeable {
     private SonicExecutor sonicExecutor;
+
     public SonicClient(SonicSettings sonicSettings){
         this.sonicExecutor = new SonicExecutor(sonicSettings);
-
     }
 
     //--------------------search channel start-----------------------------------------

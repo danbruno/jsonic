@@ -15,7 +15,6 @@ import org.kevin.pool.SonicPoolGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PreDestroy;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -42,34 +41,14 @@ public class SonicExecutor implements Closeable {
         this.addr = new InetSocketAddress(settings.getHost(), settings.getPort());
     }
 
-    /**
-     * 访问 sonic 服务器
-     *
-     * @param encoder
-     * @param decoder
-     * @return
-     */
     <T> CompletableFuture<T> execute(SonicChannel channel, Requestor.Encoder encoder, Replier.Decoder<T> decoder) {
         return execute(channel, new RequestorEncoder(encoder), new ReplierSupport<T>(decoder));
     }
 
-    /**
-     * @param encoder
-     * @param replier
-     * @param <T>
-     * @return
-     */
     <T> CompletableFuture<T> execute(SonicChannel channel, Requestor.Encoder encoder, Replier<T> replier) {
         return execute(channel, new RequestorEncoder(encoder), replier);
     }
 
-    /**
-     * @param channel
-     * @param requestor
-     * @param replier
-     * @param <T>
-     * @return
-     */
     <T> CompletableFuture<T> execute(SonicChannel channel, Requestor requestor, Replier<T> replier) {
         CompletableFuture<T> promise = new CompletableFuture<>();
         execute(channel, requestor, replier, promise);
@@ -82,7 +61,6 @@ public class SonicExecutor implements Closeable {
         pool.acquire().addListener(new SonicChannelListener<>(pool, requestor, replier, promise));
     }
 
-    @PreDestroy
     public void close() throws IOException {
         if (null != poolGroup) {
             try {

@@ -1,2 +1,2 @@
 # jsonic
-a aync client for sonic
+An async client for Sonic search
