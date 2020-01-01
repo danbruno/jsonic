@@ -56,13 +56,12 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        //ctx.pipeline().remove(this);
         super.channelReadComplete(ctx);
     }
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        if(!isAuth.get())
-            super.channelInactive(ctx);
-    }
+//    @Override
+//    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+//        if(!isAuth.get())
+//            super.channelInactive(ctx);
+//    }
 }
