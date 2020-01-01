@@ -6,7 +6,7 @@
 
   <groupId>org.kevin</groupId>
   <artifactId>jsonic</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
 
   <name>jsonic</name>
   <!-- FIXME change it to the project's website -->
