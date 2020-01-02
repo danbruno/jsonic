@@ -19,10 +19,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
-public final class SonicPool implements ChannelPool {
+public final class SonicPool extends FixedChannelPool {
 
     private static final Logger LOG = LoggerFactory.getLogger(SonicPool.class);
-    private final ChannelPool channelPool;
 
     public SonicPool(Bootstrap bootstrap,
               long readTimeout,
@@ -30,36 +29,12 @@ public final class SonicPool implements ChannelPool {
               int maxConnPerHost,
               String password,
               SonicChannel sonicChannel) {
-        this.channelPool = new FixedChannelPool(
-                bootstrap,
-                new SonicPoolHandler(readTimeout, idleTimeout, sonicChannel, password),
-                maxConnPerHost
-        );
-    }
-
-    public Future<Channel> acquire() {
-        return channelPool.acquire();
-    }
-
-    public Future<Void> release(Channel channel, Promise<Void> promise) {
-        return channelPool.release(channel, promise);
-    }
-
-    public Future<Channel> acquire(Promise<Channel> promise) {
-        return channelPool.acquire(promise);
-    }
-
-    public void close() {
-        channelPool.close();
-    }
-
-    public Future<Void> release(Channel channel) {
-        return channelPool.release(channel);
+        super(bootstrap, new SonicPoolHandler(readTimeout, idleTimeout, sonicChannel, password), maxConnPerHost);
     }
 
     private static class SonicPoolHandler implements ChannelPoolHandler {
         final long readTimeout;
-        final long idleTimeout; // 最大闲置时间(秒)
+        final long idleTimeout;
         final SonicChannel channel;
         final String password;
 
@@ -97,6 +72,8 @@ public final class SonicPool implements ChannelPool {
                     .addLast(new StringDecoder())
                     .addLast(new AuthHandler(password, this.channel))
                     .addLast(new SonicHandler());
+
+            channel.read();
         }
     }
 }
