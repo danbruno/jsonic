@@ -7,6 +7,7 @@ import org.kevin.SonicChannel;
 import org.kevin.exchange.RequestorEncoder;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,11 +58,7 @@ public abstract class CommandEncoder implements RequestorEncoder.Encoder {
         this.wrapperCommand(sb);
         sb.append("\r\n");
         ByteBuf buf = alloc.buffer(sb.length());
-        try {
-            buf.writeBytes(sb.toString().getBytes("utf-8"));
-        } catch (UnsupportedEncodingException e) {
-            //ignore
-        }
+        buf.writeBytes(sb.toString().getBytes(StandardCharsets.UTF_8));
         return Collections.singletonList(buf);
     }
 

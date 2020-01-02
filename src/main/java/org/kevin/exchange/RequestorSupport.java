@@ -13,6 +13,7 @@ public abstract class RequestorSupport implements Requestor {
     public void request(Channel channel) {
         List<Object> requests = writeRequests(channel.alloc());
         requests.forEach(channel::write);
+        requests.forEach(x -> log.info(x.toString()));
         channel.flush();
         log.info("Wrote requests");
     }
