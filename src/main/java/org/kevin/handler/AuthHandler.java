@@ -63,6 +63,6 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        ctx.pipeline().remove(this);
+        isAuth.set(false);
     }
 }
