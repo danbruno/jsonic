@@ -6,6 +6,7 @@ package org.kevin.handler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.kevin.SonicOperation;
 import org.kevin.exception.SonicException;
 import org.kevin.exception.SonicReadTimeoutException;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 
+@Slf4j
 public final class SonicHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SonicHandler.class);
@@ -40,6 +42,8 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        log.info("Read " + msg + " on channel " + ctx.channel());
+
         String resp = (String) msg;
         if(resp != null){
             if(resp.startsWith(QUERY)
