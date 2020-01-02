@@ -3,6 +3,7 @@ package org.kevin.handler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import lombok.extern.slf4j.Slf4j;
 import org.kevin.enums.Command;
 import org.kevin.SonicChannel;
 import org.slf4j.Logger;
@@ -11,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Slf4j
 public class AuthHandler extends ChannelInboundHandlerAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(AuthHandler.class);
     private final String password;
     private final SonicChannel channel;
     private AtomicBoolean isAuth = new AtomicBoolean(false);
@@ -25,7 +26,9 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         String resp = (String) msg;
+        log.info(resp);
         if(resp.startsWith("CONNECTED")){
+            log.info("Connected: " + isAuth.get());
             if(!isAuth.get()){
                 //auth with password
                 StringBuffer sb = new StringBuffer();
@@ -41,6 +44,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
                 ByteBuf buf = ctx.alloc().buffer(sb.length());
                 try {
                     buf.writeBytes(sb.toString().getBytes("utf-8"));
+                    log.info(sb.toString());
                 } catch (UnsupportedEncodingException e) {
                     //ignore
                 }
