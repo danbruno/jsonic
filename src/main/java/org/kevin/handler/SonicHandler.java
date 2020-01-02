@@ -20,11 +20,16 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SonicHandler.class);
 
-    private volatile SonicOperation<?> operation;
+    private SonicOperation<?> operation;
 
     public void operation(SonicOperation<?> operation) {
         this.operation = operation;
     }
+
+    public synchronized SonicOperation<?> getOperation() {
+        return operation;
+    }
+
     private static final String QUERY = "EVENT QUERY";
     private static final String SUGGEST = "EVENT SUGGEST";
     private static final String OK = "OK";
@@ -42,9 +47,9 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
                     || resp.startsWith(SUGGEST)
                     || resp.startsWith(RESULT)
                     || resp.startsWith(PONG)){
-                this.operation.await(resp);
+                this.getOperation().await(resp);
             }else if(resp.startsWith(ERR)){
-                this.operation.caught(new SonicException(resp));
+                this.getOperation().caught(new SonicException(resp));
             }else{
                 super.channelRead(ctx, msg);
             }
@@ -59,11 +64,11 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
         if (evt == IdleStateEvent.FIRST_READER_IDLE_STATE_EVENT
                 || evt == IdleStateEvent.READER_IDLE_STATE_EVENT) {
 
-            if (null != operation) {
+            if (null != getOperation()) {
                 throw new SonicReadTimeoutException(
                         String.format(
                                 "execute %s read timeout.",
-                                operation
+                                getOperation()
                         )
                 );
             }
@@ -80,8 +85,10 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ctx.close();
         super.channelInactive(ctx);
+        ctx.close();
+
+        SonicOperation<?> operation = getOperation();
 
         if (operation != null && !operation.isDone()) {
             throw new SonicException("channel " + ctx.channel().toString() + " closed.");
@@ -93,6 +100,7 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
 
         Throwable error = translateException(cause);
+        SonicOperation<?> operation = getOperation();
 
         if (null != operation) {
             operation.caught(error);

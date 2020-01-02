@@ -23,10 +23,9 @@ public final class SonicOperation<T> {
     }
 
     public void execute() {
-
         channel.pipeline().get(SonicHandler.class).operation(this);
-        try {
 
+        try {
             requestor.request(channel);
         } catch (Exception e) {
             caught(e);
