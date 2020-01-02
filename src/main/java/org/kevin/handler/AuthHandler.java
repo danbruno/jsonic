@@ -60,9 +60,9 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
         super.channelReadComplete(ctx);
     }
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        if(!isAuth.get())
-            super.channelInactive(ctx);
-    }
+//    @Override
+//    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+//        if(!isAuth.get())
+//            super.channelInactive(ctx);
+//    }
 }
