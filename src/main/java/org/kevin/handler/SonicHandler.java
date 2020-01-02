@@ -80,12 +80,10 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ctx.close();
         super.channelInactive(ctx);
-        if (null == operation) {
-            return;
-        }
 
-        if (!operation.isDone()) {
+        if (operation != null && !operation.isDone()) {
             throw new SonicException("channel closed.");
         }
     }
@@ -95,6 +93,7 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
         ctx.close();
 
         Throwable error = translateException(cause);
+
         if (null != operation) {
             operation.caught(error);
             return;
