@@ -8,6 +8,7 @@ import io.netty.channel.pool.FixedChannelPool;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
+import lombok.extern.slf4j.Slf4j;
 import net.jsonic.SonicChannelType;
 import net.jsonic.handler.AuthHandler;
 import net.jsonic.handler.SonicHandler;
@@ -16,9 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public final class SonicPool extends FixedChannelPool {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SonicPool.class);
 
     public SonicPool(Bootstrap bootstrap,
               long readTimeout,
@@ -43,24 +43,24 @@ public final class SonicPool extends FixedChannelPool {
         }
 
         public void channelReleased(Channel channel) throws Exception {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("channel released : {}", channel.toString());
+            if (log.isDebugEnabled()) {
+                log.debug("channel released : {}", channel.toString());
             }
 
             channel.pipeline().get(SonicHandler.class).setOperation(null);
         }
 
         public void channelAcquired(Channel channel) throws Exception {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("channel acquired : {}", channel.toString());
+            if (log.isDebugEnabled()) {
+                log.debug("channel acquired : {}", channel.toString());
             }
 
             channel.pipeline().get(SonicHandler.class).setOperation(null);
         }
 
         public void channelCreated(Channel channel) throws Exception {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("channel created : {}", channel.toString());
+            if (log.isInfoEnabled()) {
+                log.info("channel created : {}", channel.toString());
             }
 
             ChannelPipeline pipeline = channel.pipeline();

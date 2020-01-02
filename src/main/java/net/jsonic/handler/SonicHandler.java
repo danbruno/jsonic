@@ -36,9 +36,8 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        log.info("Read " + msg + " on channel " + ctx.channel());
-
         String resp = (String) msg;
+
         if(resp != null){
             if(resp.startsWith(QUERY)
                     || resp.startsWith(OK)
