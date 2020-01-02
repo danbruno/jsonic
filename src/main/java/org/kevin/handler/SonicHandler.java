@@ -74,7 +74,7 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
         // all idle event.
         if (evt == IdleStateEvent.FIRST_ALL_IDLE_STATE_EVENT
                 || evt == IdleStateEvent.ALL_IDLE_STATE_EVENT) {
-            throw new SonicTimeoutException("sonic channel was idle timeout.");
+            throw new SonicTimeoutException("sonic channel " + ctx.channel().toString() + " was idle timeout.");
         }
     }
 
@@ -84,7 +84,7 @@ public final class SonicHandler extends ChannelInboundHandlerAdapter {
         super.channelInactive(ctx);
 
         if (operation != null && !operation.isDone()) {
-            throw new SonicException("channel closed.");
+            throw new SonicException("channel " + ctx.channel().toString() + " closed.");
         }
     }
 
