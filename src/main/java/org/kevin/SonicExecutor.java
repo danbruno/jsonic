@@ -1,14 +1,20 @@
 package org.kevin;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import org.kevin.exchange.Replier;
 import org.kevin.exchange.ReplierSupport;
 import org.kevin.exchange.Requestor;
 import org.kevin.exchange.RequestorEncoder;
+import org.kevin.handler.AuthHandler;
+import org.kevin.handler.SonicHandler;
 import org.kevin.pool.PoolKey;
 import org.kevin.pool.SonicPool;
 import org.kevin.pool.SonicPoolGroup;
@@ -19,6 +25,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class SonicExecutor implements Closeable {
 
@@ -105,7 +112,11 @@ public class SonicExecutor implements Closeable {
             }
 
             Channel channel = cf.getNow();
+
             promise.whenComplete((result, error) -> pool.release(channel));
+            channel.writeAndFlush("\r\n");
+
+            ChannelPipeline pipeline = channel.pipeline();
 
             try {
 
@@ -114,6 +125,7 @@ public class SonicExecutor implements Closeable {
                     LOG.debug("execute {}", sonicOperation);
                 }
 
+                pipeline.get(AuthHandler.class).authenticate().get();
                 sonicOperation.execute();
             } catch (Exception e) {
                 promise.completeExceptionally(e);

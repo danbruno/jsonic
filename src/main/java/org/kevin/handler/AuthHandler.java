@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
@@ -17,11 +20,12 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
     private final String password;
     private final SonicChannel channel;
     private AtomicBoolean isAuth = new AtomicBoolean(false);
+    private CompletableFuture<Void> authenticatedCompleted = new CompletableFuture<>();
+
     public AuthHandler(String password, SonicChannel channel){
         this.password = password;
         this.channel = channel;
     }
-
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -42,17 +46,14 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
                 sb.append(this.password.trim());
                 sb.append("\r\n");
                 ByteBuf buf = ctx.alloc().buffer(sb.length());
-                try {
-                    buf.writeBytes(sb.toString().getBytes("utf-8"));
-                    log.info(sb.toString());
-                } catch (UnsupportedEncodingException e) {
-                    //ignore
-                }
+                buf.writeBytes(sb.toString().getBytes(StandardCharsets.UTF_8));
+                log.info(sb.toString());
                 ctx.writeAndFlush(buf);
             }
 
         }else if(resp.startsWith("STARTED")){
             isAuth.compareAndSet(false, true);
+            authenticatedCompleted.complete(null);
         }else{
             ctx.fireChannelRead(msg);
         }
@@ -68,5 +69,9 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         isAuth.set(false);
+    }
+
+    public CompletableFuture<Void> authenticate() {
+        return authenticatedCompleted;
     }
 }

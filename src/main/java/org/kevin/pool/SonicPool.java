@@ -70,10 +70,8 @@ public final class SonicPool extends FixedChannelPool {
             pipeline.addLast(new IdleStateHandler(readTimeout, 0, idleTimeout, TimeUnit.MILLISECONDS));
             pipeline.addLast(new LineBasedFrameDecoder(1024))
                     .addLast(new StringDecoder())
-                    .addLast(new AuthHandler(password, this.channel))
+                    .addLast(new AuthHandler(password, SonicChannel.SEARCH))
                     .addLast(new SonicHandler());
-
-            channel.read();
         }
     }
 }
