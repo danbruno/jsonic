@@ -92,7 +92,7 @@ public final class SonicPool implements ChannelPool {
             }
 
             ChannelPipeline pipeline = channel.pipeline();
-          //  pipeline.addLast(new IdleStateHandler(readTimeout, 0, idleTimeout, TimeUnit.MILLISECONDS));
+            pipeline.addLast(new IdleStateHandler(readTimeout, 0, idleTimeout, TimeUnit.MILLISECONDS));
             pipeline.addLast(new LineBasedFrameDecoder(1024))
                     .addLast(new StringDecoder())
                     .addLast(new AuthHandler(password, this.channel))
