@@ -25,20 +25,20 @@ public final class SonicPool extends FixedChannelPool {
               long idleTimeout,
               int maxConnPerHost,
               String password,
-              SonicChannelType sonicChannel) {
-        super(bootstrap, new SonicPoolHandler(readTimeout, idleTimeout, sonicChannel, password), maxConnPerHost);
+              SonicChannelType channelType) {
+        super(bootstrap, new SonicPoolHandler(readTimeout, idleTimeout, channelType, password), maxConnPerHost);
     }
 
     private static class SonicPoolHandler implements ChannelPoolHandler {
         final long readTimeout;
         final long idleTimeout;
-        final SonicChannelType channel;
+        final SonicChannelType channelType;
         final String password;
 
-        SonicPoolHandler(long readTimeout, long idleTimeout, SonicChannelType channel, String password) {
+        SonicPoolHandler(long readTimeout, long idleTimeout, SonicChannelType channelType, String password) {
             this.readTimeout = readTimeout;
             this.idleTimeout = idleTimeout;
-            this.channel = channel;
+            this.channelType = channelType;
             this.password = password;
         }
 
@@ -67,7 +67,7 @@ public final class SonicPool extends FixedChannelPool {
             pipeline.addLast(new IdleStateHandler(readTimeout, 0, idleTimeout, TimeUnit.MILLISECONDS));
             pipeline.addLast(new LineBasedFrameDecoder(1024))
                     .addLast(new StringDecoder())
-                    .addLast(new AuthHandler(password, SonicChannelType.SEARCH))
+                    .addLast(new AuthHandler(password, channelType))
                     .addLast(new SonicHandler());
         }
     }
