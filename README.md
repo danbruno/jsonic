@@ -1,2 +1,2 @@
 # jsonic
-An async client for Sonic search
+An asynchronous Java client for Sonic search.
